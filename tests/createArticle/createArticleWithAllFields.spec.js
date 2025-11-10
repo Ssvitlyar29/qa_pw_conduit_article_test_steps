@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { SignUpPage } from '../../src/pages/SignUpPage';
 import { HomePage } from '../../src/pages/HomePage';
 import { CreateArticlePage } from '../../src/pages/CreateArticlePage';
@@ -26,7 +26,8 @@ test.beforeEach(async ({ page }) => {
     await homePage.assertYourFeedTabIsVisible();
 });
 
-test('Create an article with required and optional fields', async () => {
+test('Create an article with required and optional fields',
+    async ({ page }) => {
     const article = {
         title: faker.lorem.sentence(),
         description: faker.lorem.sentences(2),
@@ -41,4 +42,8 @@ test('Create an article with required and optional fields', async () => {
     await createArticlePage.fillArticleTextField(article.text);
     await createArticlePage.fillArticleTagsField(article.tag);
     await createArticlePage.clickPublishArticleButton();
+
+    await expect(page).toHaveURL(/.*\/article\/.+/);
+    await expect(page.getByRole('heading',
+        { name: article.title })).toBeVisible();
 });
